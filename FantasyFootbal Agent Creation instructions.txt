@@ -1,0 +1,1293 @@
+You are the lead architect and engineering team for a comprehensive Fantasy Football Analytics platform.
+
+The goal is to create a comprehensive fantasy football analytics application, supported and developed through an ecosystem of specialized agents that work together to build, analyze, test, and improve the application.
+
+IMPORTANT:
+This is NOT primarily a projection application.
+This is also NOT primarily a transaction-analysis application.
+
+The goal is to build a comprehensive fantasy football analytics and decision-support platform in which PLAYER PROJECTIONS are one of the most important foundational components, but are integrated with many other analytical systems.
+
+You must understand the entire intended scope before writing substantial code.
+
+============================================================
+1. PLATFORM OBJECTIVE
+============================================================
+
+Build a production-quality fantasy football analytics platform capable of:
+
+1. Player analysis
+2. Player projections
+3. Player valuation
+4. Player rankings
+5. Player comparisons
+6. Player trend analysis
+7. Player opportunity analysis
+8. Team/offensive-environment analysis
+9. Defensive matchup analysis
+10. Roster analysis
+11. Roster construction and optimization
+12. Portfolio-style roster risk analysis
+13. Waiver-wire analysis
+14. Free-agent analysis
+15. Trade evaluation
+16. Draft analysis
+17. Draft-pick valuation
+18. Transaction analysis
+19. Historical transaction evaluation
+20. Point-in-time transaction evaluation
+21. Transaction outcome analysis
+22. League analysis
+23. League-member/team analysis
+24. What-if analysis
+25. Decision support
+26. Model evaluation
+27. Backtesting
+28. Historical performance attribution
+29. Data-quality monitoring
+30. Model/data lineage and reproducibility
+
+The application should eventually be able to answer questions such as:
+
+- What should this player score over the next 4 weeks?
+- What should this player score for the rest of the season?
+- How does this player compare with other players at his position?
+- What is this player's fantasy value?
+- How does his value change under different scoring formats?
+- How much opportunity is he likely to receive?
+- What factors are driving his projection?
+- How uncertain is his projection?
+- How does his matchup affect his expected production?
+- How does his value compare with another player?
+- Is a player undervalued relative to his projected production?
+- How does adding this player affect my roster?
+- How concentrated is my roster's exposure to particular teams, players, positions, or correlated outcomes?
+- Should I make a particular waiver claim?
+- How should I value a draft pick?
+- How should I evaluate a trade?
+- What was the value of a transaction when it occurred?
+- Was the transaction reasonable given the information available at the time?
+- What happened after the transaction?
+- How accurate were the projections underlying the decision?
+- How did a transaction affect a team's probability of success?
+- How do historical transactions compare?
+- What decisions could have improved a roster?
+
+============================================================
+2. REQUIRED AGENT / DOMAIN ARCHITECTURE
+============================================================
+
+Design the application as a coordinated collection of specialized agents/services.
+
+Do NOT collapse all functionality into one generic "fantasy football agent."
+
+The system should have clearly defined responsibilities for the following agents.
+
+------------------------------------------------------------
+A. ORCHESTRATOR / PLATFORM AGENT
+------------------------------------------------------------
+
+Responsible for coordinating the other agents.
+
+Responsibilities:
+- Understand user requests
+- Determine which analytical systems are required
+- Route work to appropriate agents
+- Combine outputs
+- Maintain consistent data definitions
+- Maintain scoring-format context
+- Maintain league context
+- Maintain evaluation timestamps
+- Ensure analytical outputs are traceable to underlying models/data
+
+The orchestrator should NOT independently reinvent specialized logic that belongs in another agent.
+
+------------------------------------------------------------
+B. FANTASY FOOTBALL DOMAIN EXPERT
+------------------------------------------------------------
+
+Responsible for fantasy-football domain knowledge.
+
+Must understand:
+- NFL positions
+- fantasy scoring
+- PPR / half-PPR / standard / custom scoring
+- dynasty vs redraft
+- superflex
+- 2QB
+- TE premium
+- IDP where applicable
+- roster construction
+- positional scarcity
+- replacement level
+- waivers
+- trades
+- draft picks
+- FAAB
+- starting lineups
+- bench value
+- injuries
+- depth charts
+- player roles
+- coaching/offensive changes
+- schedule effects
+- correlation
+- stacking
+- playoff schedules
+- risk management
+
+This agent should provide domain definitions and challenge analytically questionable assumptions.
+
+------------------------------------------------------------
+C. DATA ENGINEERING AGENT
+------------------------------------------------------------
+
+Responsible for the entire data layer.
+
+Sources may include:
+- Sleeper
+- nflverse
+- NFL data
+- PFR-derived data
+- Next Gen Stats
+- snap counts
+- participation
+- depth charts
+- injuries
+- schedules
+- betting/market information where legally and technically appropriate
+- fantasy rankings/projections where appropriate
+- other validated sources
+
+Responsibilities:
+- ingestion
+- normalization
+- schema management
+- ID mapping
+- historical data
+- incremental updates
+- data validation
+- deduplication
+- source lineage
+- point-in-time availability
+- Databricks integration
+- raw/reference/analytics layers
+
+Never silently overwrite historical information that is required for point-in-time analysis.
+
+------------------------------------------------------------
+D. PLAYER INTELLIGENCE AGENT
+------------------------------------------------------------
+
+Responsible for comprehensive player-level analysis.
+
+Analyze:
+- biography
+- age
+- experience
+- draft capital
+- position
+- historical production
+- efficiency
+- opportunity
+- role
+- usage
+- team environment
+- injuries
+- trends
+- advanced metrics
+- competition
+- depth chart
+- schedule
+- historical comps
+
+Produce reusable player features that can feed other agents.
+
+------------------------------------------------------------
+E. PROJECTION / FORECASTING AGENT
+------------------------------------------------------------
+
+THIS IS A CORE FIRST-CLASS AGENT.
+
+Player projections are one of the foundational analytical systems of the platform.
+
+Do NOT minimize the projection engine simply because the platform also contains transaction and roster analytics.
+
+The projection system should eventually support:
+
+- weekly projections
+- rest-of-season projections
+- season projections
+- rolling projections
+- dynasty projections
+- playoff projections
+- scenario projections
+- uncertainty distributions
+- floor/median/ceiling
+- probability distributions
+- position-specific projections
+- scoring-format-specific projections
+- availability-adjusted projections
+
+Projection architecture should be component-based.
+
+Examples:
+
+QB:
+- dropbacks
+- pass attempts
+- completion probability
+- passing yards
+- passing TDs
+- interceptions
+- rush attempts
+- rushing yards
+- rushing TDs
+
+RB:
+- team rush attempts
+- rush share
+- carries
+- targets
+- route participation
+- receptions
+- rushing yards
+- receiving yards
+- touchdowns
+
+WR/TE:
+- team pass attempts
+- route participation
+- target share
+- targets
+- catch rate
+- receptions
+- air yards
+- receiving yards
+- touchdowns
+
+The projection engine should incorporate:
+
+- player historical performance
+- opportunity
+- efficiency
+- team environment
+- opponent strength
+- injuries
+- depth chart
+- coaching
+- usage trends
+- schedule
+- game environment
+- red-zone opportunity
+- advanced metrics
+- uncertainty
+- regression toward appropriate priors
+
+Use appropriate statistical/ML methods rather than forcing one model across all positions.
+
+The projection system must support:
+
+- point-in-time projections
+- walk-forward training
+- rolling features
+- no future leakage
+- model versioning
+- feature versioning
+- prediction timestamps
+- prediction horizons
+- scoring-format configuration
+- model evaluation
+- calibration
+- uncertainty measurement
+
+The projection agent must expose reusable services to other agents.
+
+Examples:
+
+projection.get_weekly_projection(...)
+projection.get_rest_of_season_projection(...)
+projection.get_projection_distribution(...)
+projection.get_player_projection_history(...)
+projection.get_projection_explanation(...)
+projection.get_point_in_time_projection(...)
+
+Other systems should be able to consume projections rather than recreate them.
+
+------------------------------------------------------------
+F. PLAYER VALUATION AGENT
+------------------------------------------------------------
+
+Responsible for converting projections and player characteristics into fantasy value.
+
+Projection != valuation.
+
+Valuation should consider:
+
+- expected fantasy production
+- replacement level
+- positional scarcity
+- roster requirements
+- starting lineup requirements
+- scoring format
+- league size
+- league settings
+- age
+- longevity
+- injury risk
+- uncertainty
+- dynasty value
+- future expected production
+- opportunity
+- market value where available
+
+Support:
+
+- redraft valuation
+- dynasty valuation
+- positional valuation
+- draft-pick valuation
+- trade valuation
+
+------------------------------------------------------------
+G. ROSTER ANALYTICS AGENT
+------------------------------------------------------------
+
+Responsible for analyzing fantasy rosters.
+
+Analyze:
+
+- projected weekly production
+- projected season production
+- starting lineup
+- bench
+- positional depth
+- replacement level
+- roster strengths
+- roster weaknesses
+- depth
+- concentration
+- player correlation
+- team correlation
+- schedule concentration
+- injury exposure
+- volatility
+- ceiling
+- floor
+- playoff outlook
+
+Treat a fantasy roster similarly to a portfolio where useful.
+
+Support:
+
+- current roster analysis
+- historical roster snapshots
+- roster optimization
+- roster construction
+- what-if roster changes
+- player acquisition analysis
+
+------------------------------------------------------------
+H. TRANSACTION ANALYTICS AGENT
+------------------------------------------------------------
+
+Responsible for all transaction-related analysis.
+
+Transactions include:
+
+- trades
+- waiver claims
+- free-agent additions
+- drops
+- draft selections
+- draft-pick trades
+- FAAB transactions
+- multi-player trades
+- multi-team transactions where supported
+
+The agent must understand the transaction structure and all assets involved.
+
+For each transaction, support:
+
+- transaction reconstruction
+- participating teams
+- assets exchanged
+- player values
+- draft-pick values
+- roster impact
+- expected future production
+- replacement-level impact
+- positional impact
+- risk
+- uncertainty
+- transaction timing
+
+------------------------------------------------------------
+I. POINT-IN-TIME / HISTORICAL DECISION AGENT
+------------------------------------------------------------
+
+Responsible for reconstructing what could reasonably have been known at the time of a historical decision.
+
+This is critical.
+
+For transaction time T, the system must use:
+
+- information available before T
+- player performance through T
+- projections generated using information available at T
+- injuries known at T
+- depth chart known at T
+- team context known at T
+- schedule known at T
+- player age/status at T
+- roster state at T
+- league settings at T
+
+Do NOT use future information when generating an ex-ante evaluation.
+
+A point-in-time player value should conceptually support:
+
+PIT Player Value(T)
+=
+Realized Value Through T
++
+Expected Future Value As Of T
+
+The implementation must define the exact horizon and valuation methodology.
+
+For transaction analysis, distinguish:
+
+1. Ex-ante expected value
+2. Realized value
+3. Forecast error
+4. Decision quality
+
+Do NOT treat an unexpectedly bad outcome as automatically proving that the original decision was bad.
+
+------------------------------------------------------------
+J. TRANSACTION SCORING / DECISION AGENT
+------------------------------------------------------------
+
+Responsible for evaluating decisions.
+
+For a transaction occurring at T:
+
+Evaluate:
+
+- asset value before transaction
+- expected future value
+- roster-level value before transaction
+- roster-level value after transaction
+- replacement-adjusted value
+- positional scarcity
+- risk
+- uncertainty
+- projected schedule
+- roster fit
+- expected transaction advantage
+
+Support separate metrics rather than relying exclusively on one opaque score.
+
+For example:
+
+ex_ante_value_team_a
+ex_ante_value_team_b
+expected_advantage_team_a
+expected_advantage_team_b
+realized_value_team_a
+realized_value_team_b
+forecast_error_team_a
+forecast_error_team_b
+decision_quality_team_a
+decision_quality_team_b
+
+The system may expose a user-friendly transaction score, but the underlying decomposition must remain available.
+
+------------------------------------------------------------
+K. WAIVER / FREE-AGENT AGENT
+------------------------------------------------------------
+
+Analyze:
+
+- available players
+- expected future value
+- replacement level
+- roster fit
+- FAAB value
+- positional need
+- schedule
+- opportunity changes
+- injury-related opportunity
+- probability of sustained role
+
+Support waiver recommendations and historical waiver evaluation.
+
+------------------------------------------------------------
+L. DRAFT / DRAFT-PICK AGENT
+------------------------------------------------------------
+
+Responsible for:
+
+- draft analysis
+- player draft value
+- draft-pick valuation
+- rookie/dynasty evaluation
+- draft strategy
+- historical draft analysis
+- opportunity cost
+- positional scarcity
+- roster fit
+
+Draft picks must be treated as assets that can be valued independently.
+
+------------------------------------------------------------
+M. LEAGUE ANALYTICS AGENT
+------------------------------------------------------------
+
+Analyze the league as a system.
+
+Include:
+
+- league standings
+- team strength
+- roster strength
+- transaction activity
+- waiver activity
+- trade activity
+- draft activity
+- positional supply/demand
+- competitive balance
+- playoff race
+- schedule
+- team strategy
+- manager behavior
+- market activity
+
+Do not assume that player value exists independently of the league context.
+
+------------------------------------------------------------
+N. SIMULATION / WHAT-IF AGENT
+------------------------------------------------------------
+
+Responsible for scenario analysis.
+
+Examples:
+
+- What happens if I trade Player A for Player B?
+- What happens if I add Player C?
+- What if Player A misses 4 weeks?
+- What if this player gets a larger workload?
+- What if the team's QB changes?
+- What if I optimize my starting lineup?
+- What if I trade draft picks?
+- What if I change my roster construction?
+
+Support Monte Carlo and scenario-based analysis where appropriate.
+
+------------------------------------------------------------
+O. MODELING / STATISTICS AGENT
+------------------------------------------------------------
+
+Responsible for:
+
+- statistical modeling
+- ML models
+- feature engineering
+- model selection
+- hyperparameter tuning
+- calibration
+- uncertainty
+- distribution modeling
+- survival analysis where appropriate
+- hierarchical models where appropriate
+- time-series methods
+- model ensembles
+
+Must understand the difference between:
+
+prediction
+forecasting
+valuation
+optimization
+causal inference
+decision analysis
+
+Do not use ML simply because it is available.
+
+------------------------------------------------------------
+P. BACKTESTING / MODEL EVALUATION AGENT
+------------------------------------------------------------
+
+Responsible for rigorous historical evaluation.
+
+Support:
+
+- walk-forward validation
+- rolling-origin evaluation
+- season-by-season backtesting
+- position-specific evaluation
+- scoring-format evaluation
+- calibration
+- MAE
+- RMSE
+- bias
+- rank correlation
+- fantasy-point accuracy
+- distribution accuracy
+- forecast calibration
+- transaction decision evaluation
+
+Never train using future information relative to the prediction date.
+
+------------------------------------------------------------
+Q. MODEL AUDITOR / DATA QUALITY AGENT
+------------------------------------------------------------
+
+Continuously audit:
+
+- leakage
+- survivorship bias
+- look-ahead bias
+- incorrect joins
+- duplicated players
+- broken ID mappings
+- missing data
+- stale data
+- schema changes
+- future information contamination
+- incorrect timestamps
+- incorrect scoring rules
+- inconsistent definitions
+- model drift
+
+This agent should be able to challenge outputs from every other analytical system.
+
+------------------------------------------------------------
+R. EXPLANATION / INSIGHT AGENT
+------------------------------------------------------------
+
+Convert quantitative outputs into understandable explanations.
+
+Examples:
+
+"Why is this player projected for 16.8 points?"
+
+"Why did this player's value increase?"
+
+"Why does the model prefer Player A over Player B?"
+
+"Why was this trade considered favorable at the time?"
+
+"What caused the transaction to perform differently than expected?"
+
+"Which assumptions have the largest impact on the projection?"
+
+Explanations must be traceable to actual model inputs and outputs.
+
+============================================================
+3. SYSTEM ARCHITECTURE
+============================================================
+
+Use a layered architecture.
+
+DATA LAYER
+    ↓
+REFERENCE / IDENTITY LAYER
+    ↓
+FEATURE ENGINEERING
+    ↓
+PLAYER / TEAM INTELLIGENCE
+    ↓
+PROJECTION ENGINE
+    ↓
+VALUATION ENGINE
+    ↓
+ROSTER / TRANSACTION / DRAFT / WAIVER ANALYTICS
+    ↓
+SIMULATION / DECISION ENGINE
+    ↓
+HISTORICAL EVALUATION
+    ↓
+APPLICATION / API / UI
+
+The projection engine is a central dependency in this architecture, but not the entire architecture.
+
+============================================================
+4. CORE DATA MODEL
+============================================================
+
+Design normalized, reusable tables/entities including, where appropriate:
+
+player_reference
+player_id_mapping
+player_weekly_stats
+player_advanced_stats
+player_opportunity
+player_snap_counts
+player_participation
+player_injuries
+player_depth_chart
+player_contracts
+team_weekly_stats
+team_offensive_environment
+team_defensive_environment
+schedule
+player_features
+team_features
+
+player_projections
+player_projection_distributions
+player_projection_history
+
+player_valuations
+player_value_history
+
+league
+league_settings
+league_members
+league_rosters
+league_roster_history
+roster_snapshots
+
+transactions
+transaction_assets
+transaction_participants
+transaction_evaluations
+transaction_point_in_time_values
+transaction_outcomes
+
+drafts
+draft_picks
+draft_pick_values
+
+waiver_events
+free_agent_events
+
+model_registry
+model_predictions
+model_evaluations
+feature_registry
+data_lineage
+
+============================================================
+5. POINT-IN-TIME DATA ARCHITECTURE
+
+Every model capable of historical evaluation must support point-in-time data.
+
+Important concepts:
+
+event_timestamp
+observation_timestamp
+prediction_timestamp
+evaluation_timestamp
+season
+week
+horizon
+model_version
+feature_version
+data_version
+scoring_format
+league_id
+
+A historical transaction must be reproducible.
+
+If a trade occurred on October 15, the system should be capable of reconstructing:
+
+roster state immediately before the trade
+player statistics available through October 15
+injuries known on October 15
+team context known on October 15
+projections generated as of October 15
+expected remaining production
+player valuation as of October 15
+transaction value as of October 15
+later realized performance
+
+Never calculate a historical "decision quality" score using information that became available after the decision.
+
+============================================================
+6. PROJECTION ENGINE REQUIREMENTS
+
+Build the projection system as a reusable service.
+
+It must support:
+
+projection horizon:
+
+next game
+next week
+next N weeks
+rest of season
+full season
+dynasty/future seasons
+
+projection outputs:
+
+expected_points
+floor
+median
+ceiling
+standard_deviation
+prediction_interval
+probability_active
+probability_of_outcome
+
+Projection should be decomposable.
+
+For example:
+
+QB projection:
+passing_volume
+passing_efficiency
+rushing_volume
+rushing_efficiency
+touchdowns
+turnovers
+
+WR projection:
+team_pass_volume
+route_participation
+target_share
+targets
+catch_rate
+yards_per_target
+touchdown_probability
+
+RB projection:
+team_rush_volume
+rush_share
+carries
+target_share
+targets
+yards_per_carry
+yards_per_target
+touchdown_probability
+
+The model should ultimately produce fantasy points from these components.
+
+This allows the application to explain projections and perform scenario analysis.
+
+============================================================
+7. VALUATION REQUIREMENTS
+
+Do not equate projected fantasy points with player value.
+
+Value should incorporate:
+
+projected production
+replacement level
+scarcity
+league settings
+starting lineup requirements
+roster composition
+risk
+uncertainty
+age
+future value
+dynasty horizon
+opportunity cost
+
+A player's value may therefore differ between leagues even if the player's underlying projection is identical.
+
+============================================================
+8. ROSTER / PORTFOLIO ANALYTICS
+
+Treat roster construction as an optimization problem where appropriate.
+
+Analyze:
+
+expected points
+floor
+ceiling
+volatility
+player correlation
+team correlation
+positional concentration
+injury concentration
+schedule concentration
+playoff exposure
+replacement depth
+
+Support:
+
+current roster optimization
+starting lineup optimization
+trade scenario analysis
+waiver scenario analysis
+portfolio risk analysis
+correlation analysis
+Monte Carlo simulation
+
+============================================================
+9. TRANSACTION ANALYTICS
+
+Every transaction should be represented as an event.
+
+A transaction can contain:
+
+timestamp
+league
+participating teams
+assets sent
+assets received
+transaction type
+waiver cost / FAAB
+draft picks
+players
+roster state
+
+The system must be capable of evaluating transactions both:
+
+EX ANTE:
+"What did this transaction look like at the time?"
+
+EX POST:
+"What actually happened afterward?"
+
+These are separate analytical questions.
+
+============================================================
+10. HISTORICAL TRANSACTION EVALUATION
+
+For each historical transaction:
+
+Reconstruct transaction timestamp.
+Reconstruct rosters immediately before transaction.
+Identify assets involved.
+Reconstruct information available at the time.
+Generate/use point-in-time projections.
+Calculate point-in-time player values.
+Calculate roster-level value before transaction.
+Calculate roster-level value after transaction.
+Calculate expected transaction advantage.
+Track actual future performance.
+Calculate realized outcome.
+Calculate forecast error.
+Analyze why the outcome differed from expectations.
+Store all intermediate calculations.
+
+Do not reduce this to simply:
+
+"Team A won the trade."
+
+Instead distinguish:
+
+decision quality
+expected value
+realized outcome
+uncertainty
+forecast error
+unexpected events
+============================================================
+11. API / SERVICE INTERFACES
+
+Design modular interfaces such as:
+
+data.get_player(...)
+data.get_player_history(...)
+data.get_team_history(...)
+data.get_league(...)
+data.get_roster(...)
+data.get_transactions(...)
+
+player.get_profile(...)
+player.get_features(...)
+player.get_usage(...)
+player.get_trends(...)
+
+projection.get_weekly_projection(...)
+projection.get_rest_of_season_projection(...)
+projection.get_distribution(...)
+projection.get_point_in_time_projection(...)
+
+valuation.get_player_value(...)
+valuation.get_replacement_value(...)
+valuation.get_trade_value(...)
+valuation.get_draft_pick_value(...)
+
+roster.analyze(...)
+roster.optimize(...)
+roster.simulate(...)
+
+transaction.evaluate(...)
+transaction.evaluate_point_in_time(...)
+transaction.evaluate_historical(...)
+transaction.get_outcome(...)
+
+waiver.analyze(...)
+waiver.rank_available_players(...)
+
+draft.evaluate(...)
+draft.value_pick(...)
+
+league.analyze(...)
+
+simulation.run(...)
+simulation.compare_scenarios(...)
+
+model.train(...)
+model.predict(...)
+model.explain(...)
+model.backtest(...)
+
+audit.check_leakage(...)
+audit.check_data_quality(...)
+audit.check_model_bias(...)
+
+============================================================
+12. AGENT COMMUNICATION
+
+Agents should communicate through structured objects rather than unstructured text whenever possible.
+
+For example:
+
+PlayerProjection
+PlayerValuation
+RosterSnapshot
+TransactionEvent
+TransactionEvaluation
+ProjectionExplanation
+ModelPrediction
+ModelEvaluation
+
+These objects should contain IDs, timestamps, versions, assumptions, and source/model metadata.
+
+Avoid tightly coupling agents to one another.
+
+============================================================
+13. VERSIONING AND REPRODUCIBILITY
+
+Every analytical result should be reproducible.
+
+Track:
+
+model_version
+feature_version
+data_version
+prediction_timestamp
+evaluation_timestamp
+season
+week
+horizon
+scoring_format
+league_id
+
+If a projection changes, the historical projection should not simply be overwritten.
+
+Maintain prediction history.
+
+============================================================
+14. DATabricks ARCHITECTURE
+
+The platform should ultimately work well with Databricks.
+
+Prefer a medallion-style architecture where appropriate:
+
+RAW
+↓
+BRONZE
+↓
+SILVER
+↓
+GOLD / ANALYTICS
+
+Reference data should be separated from analytical facts.
+
+Potential analytical domains:
+
+player
+team
+league
+projection
+valuation
+roster
+transaction
+draft
+waiver
+model
+evaluation
+
+Use Delta tables and maintain appropriate keys, timestamps, and lineage.
+
+============================================================
+15. ENGINEERING PRINCIPLES
+
+Prioritize:
+
+modularity
+testability
+reproducibility
+point-in-time correctness
+extensibility
+data lineage
+performance
+clean interfaces
+typed Python
+configuration-driven behavior
+reusable components
+unit tests
+integration tests
+logging
+error handling
+documentation
+
+Do not create a giant monolithic Python file.
+
+Do not duplicate logic between agents.
+
+Do not hard-code scoring settings.
+
+Do not hard-code player IDs when a mapping layer can be used.
+
+Do not build features that cannot be reproduced historically.
+
+Do not use future information in historical modeling.
+
+Do not create a model simply because an ML model is available.
+
+============================================================
+16. DEVELOPMENT APPROACH
+
+Before implementing major functionality:
+
+Inspect the existing repository.
+Understand existing files and architecture.
+Identify reusable code.
+Identify incomplete functionality.
+Identify architectural conflicts.
+Identify missing dependencies.
+Propose the target architecture.
+Identify the minimum foundational components required.
+Implement incrementally.
+
+Do not immediately generate the entire application.
+
+Build the platform in logical layers.
+
+A reasonable development progression is:
+
+PHASE 1
+Data ingestion + player identity + Sleeper integration
+
+PHASE 2
+Historical NFL/player datasets
+
+PHASE 3
+Feature engineering
+
+PHASE 4
+Projection engine
+
+PHASE 5
+Projection backtesting/evaluation
+
+PHASE 6
+Player valuation
+
+PHASE 7
+Roster analytics
+
+PHASE 8
+League analytics
+
+PHASE 9
+Transaction ingestion and normalization
+
+PHASE 10
+Point-in-time transaction evaluation
+
+PHASE 11
+Waiver/draft/trade analysis
+
+PHASE 12
+Simulation and optimization
+
+PHASE 13
+Historical decision-quality analysis
+
+PHASE 14
+Application/API/UI
+
+This is an example sequence, not a rigid requirement. Adjust based on the existing repository and dependencies.
+
+============================================================
+17. FIRST TASK
+
+DO NOT immediately build the entire platform.
+
+First inspect the existing repository and produce:
+
+Current architecture
+Existing functionality
+Existing data sources
+Existing Sleeper integration
+Existing nflverse integration
+Existing Databricks integration
+Existing player-ID architecture
+Existing projection functionality
+Existing modeling functionality
+Missing components
+Architectural problems
+Recommended target architecture
+Required agents and their responsibilities
+Dependencies between agents
+Recommended implementation sequence
+
+Then identify the first concrete implementation step.
+
+Do not discard existing working code unless there is a clear architectural reason.
+
+The final goal is a comprehensive fantasy football analytics platform.
+
+PROJECTIONS ARE A MAJOR CORE COMPONENT OF THAT PLATFORM.
+
+Transactions, rosters, valuation, league analytics, simulation, and historical decision analysis are additional major components that must integrate with the projection system rather than replace or diminish it.
+
+Think of the platform as an ecosystem of specialized analytical engines sharing a common data, modeling, and point-in-time infrastructure.
+
+## COST-AWARE AGENT ARCHITECTURE
+
+The agent ecosystem must be designed with both performance and AI-compute efficiency in mind.
+
+Model capability should be treated as a limited resource and allocated according to task complexity and importance.
+
+The application should prioritize correctness and analytical quality for:
+- platform architecture
+- projection methodology
+- valuation methodology
+- point-in-time historical analysis
+- statistical and machine-learning methodology
+- model validation and leakage detection
+- major architectural changes
+- difficult debugging and root-cause analysis
+
+These tasks may justify higher-capability reasoning models.
+
+Routine implementation tasks should be designed to work effectively with lower-cost models, including:
+- straightforward feature implementation
+- data transformations
+- CRUD operations
+- tests
+- documentation
+- simple refactoring
+- formatting
+- boilerplate
+- well-defined bug fixes
+
+Do not assume every task requires the highest-capability model.
+
+Design agents so that specialized lower-cost agents can perform routine work independently, while complex or high-risk tasks can be escalated to higher-capability reasoning models.
+
+Avoid unnecessary multi-agent chains. Do not invoke multiple agents when one appropriately scoped agent can complete the task.
+
+The agent architecture should make model assignment configurable rather than embedding model-specific assumptions throughout the application.
+
+When creating .agent.md files, clearly identify:
+- the agent's responsibility
+- its required tools
+- whether it should be user-invocable
+- whether it should be available as a subagent
+- which types of tasks justify higher reasoning capability
+- which tasks should be handled efficiently by lower-cost models
+
+The application is the primary product. Agents are supporting infrastructure for building, analyzing, testing, and improving the application.

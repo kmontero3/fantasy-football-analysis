@@ -1,0 +1,43 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+build/
+dist/
+.dist/
+
+# Local databases / caches
+*.db
+*.sqlite
+*.sqlite3
+.duckdb/
+
+# Jupyter / notebooks
+.ipynb_checkpoints/
+
+# Databricks
+.databricks/
+databricks.yml.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Scratch output
+run_output.txt
