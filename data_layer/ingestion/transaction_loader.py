@@ -70,21 +70,26 @@ def ingest_transactions_for_season(
             for roster_id in tx.get("roster_ids") or []:
                 session.add(
                     TransactionRosterParticipant(
-                        transaction_id=transaction_id, sleeper_roster_id=roster_id
+                        transaction_id=transaction_id,
+                        sleeper_roster_id=roster_id,
+                        source=SOURCE,
+                        loaded_at=now,
                     )
                 )
 
-            _add_player_assets(session, transaction_id, tx.get("adds") or {}, direction="add")
-            _add_player_assets(session, transaction_id, tx.get("drops") or {}, direction="drop")
-            _add_faab_assets(session, transaction_id, tx.get("waiver_budget") or [])
-            _add_pick_assets(session, transaction_id, tx.get("draft_picks") or [])
+            _add_player_assets(session, transaction_id, tx.get("adds") or {}, direction="add", now=now)
+            _add_player_assets(session, transaction_id, tx.get("drops") or {}, direction="drop", now=now)
+            _add_faab_assets(session, transaction_id, tx.get("waiver_budget") or [], now=now)
+            _add_pick_assets(session, transaction_id, tx.get("draft_picks") or [], now=now)
 
             inserted += 1
 
     return inserted
 
 
-def _add_player_assets(session: Session, transaction_id: str, moves: dict, direction: str) -> None:
+def _add_player_assets(
+    session: Session, transaction_id: str, moves: dict, direction: str, now: dt.datetime
+) -> None:
     for sleeper_player_id, roster_id in moves.items():
         session.add(
             TransactionAsset(
@@ -94,11 +99,13 @@ def _add_player_assets(session: Session, transaction_id: str, moves: dict, direc
                 roster_id=roster_id,
                 sleeper_player_id=sleeper_player_id,
                 player_id=resolve_player_id(session, sleeper_player_id),
+                source=SOURCE,
+                loaded_at=now,
             )
         )
 
 
-def _add_faab_assets(session: Session, transaction_id: str, faab_moves: list) -> None:
+def _add_faab_assets(session: Session, transaction_id: str, faab_moves: list, now: dt.datetime) -> None:
     for move in faab_moves:
         session.add(
             TransactionAsset(
@@ -106,11 +113,13 @@ def _add_faab_assets(session: Session, transaction_id: str, faab_moves: list) ->
                 asset_type="faab",
                 roster_id=move.get("receiver"),
                 faab_amount=move.get("amount"),
+                source=SOURCE,
+                loaded_at=now,
             )
         )
 
 
-def _add_pick_assets(session: Session, transaction_id: str, picks: list) -> None:
+def _add_pick_assets(session: Session, transaction_id: str, picks: list, now: dt.datetime) -> None:
     for pick in picks:
         session.add(
             TransactionAsset(
@@ -121,5 +130,7 @@ def _add_pick_assets(session: Session, transaction_id: str, picks: list) -> None
                 pick_round=pick.get("round"),
                 pick_original_roster_id=pick.get("roster_id"),
                 pick_new_owner_roster_id=pick.get("owner_id"),
+                source=SOURCE,
+                loaded_at=now,
             )
         )

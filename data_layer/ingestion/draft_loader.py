@@ -38,7 +38,7 @@ def ingest_drafts_for_season(session: Session, sleeper: SleeperAPI, settings: Le
             session.add(draft)
         session.flush()
 
-        _ingest_picks(session, sleeper, draft)
+        _ingest_picks(session, sleeper, draft, now)
         count += 1
 
         _ingest_traded_picks(
@@ -53,7 +53,7 @@ def ingest_drafts_for_season(session: Session, sleeper: SleeperAPI, settings: Le
     return count
 
 
-def _ingest_picks(session: Session, sleeper: SleeperAPI, draft: Draft) -> None:
+def _ingest_picks(session: Session, sleeper: SleeperAPI, draft: Draft, now: dt.datetime) -> None:
     picks = sleeper.get_draft_picks(draft.draft_id)
 
     for pick in picks:
@@ -74,6 +74,8 @@ def _ingest_picks(session: Session, sleeper: SleeperAPI, draft: Draft) -> None:
         draft_pick.player_id = resolve_player_id(session, sleeper_player_id)
         draft_pick.is_keeper = pick.get("is_keeper")
         draft_pick.metadata_raw = pick.get("metadata")
+        draft_pick.source = SOURCE
+        draft_pick.loaded_at = now
 
         if not existing:
             session.add(draft_pick)

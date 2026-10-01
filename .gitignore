@@ -21,6 +21,7 @@ dist/
 *.sqlite
 *.sqlite3
 .duckdb/
+!data/fantasy.db
 
 # Jupyter / notebooks
 .ipynb_checkpoints/
