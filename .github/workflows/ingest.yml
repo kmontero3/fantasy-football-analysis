@@ -31,6 +31,9 @@ jobs:
           PHINASTY_LEAGUE_2026: ${{ secrets.PHINASTY_LEAGUE_2026 }}
         run: python -m data_layer.ingestion.run_ingestion
 
+      - name: Verify database integrity
+        run: python -m scripts.check_db
+
       - name: Commit updated database
         run: |
           git config user.name "github-actions[bot]"
