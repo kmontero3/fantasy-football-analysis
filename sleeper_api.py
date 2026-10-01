@@ -483,6 +483,127 @@ class SleeperAPI:
         )
 
 
+class SleeperProjectionsAPI:
+    """
+    Client for Sleeper's undocumented third-party player-projections endpoints.
+
+    This is a *separate* base domain (``api.sleeper.com``, not
+    ``api.sleeper.app/v1`` used by :class:`SleeperAPI`) and an undocumented,
+    observed-to-work API, so it is kept as its own small client rather than
+    bolted onto ``SleeperAPI.BASE_URL``.
+
+    IMPORTANT: this is vendor/benchmark projection data, not this platform's
+    own projection-engine output. See ``data_layer.models.projections`` and
+    ``data_layer.ingestion.projection_loader`` for how it is tagged/stored.
+    """
+
+    BASE_URL = "https://api.sleeper.com/projections/nfl"
+
+    def __init__(
+        self,
+        timeout: int = 30,
+        session: Optional[requests.Session] = None,
+    ):
+        self.timeout = timeout
+        self.session = session or requests.Session()
+
+        self.session.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent": "SleeperAPIClient/1.0",
+            }
+        )
+
+    def _get(
+        self,
+        url: str,
+        params: Optional[Dict[str, Any]] = None,
+    ) -> Any:
+        try:
+            response = self.session.get(
+                url,
+                params=params,
+                timeout=self.timeout,
+            )
+
+        except requests.RequestException as exc:
+            raise SleeperAPIError(
+                status_code=0,
+                message=str(exc),
+                url=url,
+            ) from exc
+
+        if not response.ok:
+            try:
+                error_body = response.json()
+            except ValueError:
+                error_body = response.text
+
+            raise SleeperAPIError(
+                status_code=response.status_code,
+                message=str(error_body),
+                url=response.url,
+            )
+
+        try:
+            return response.json()
+
+        except ValueError as exc:
+            raise SleeperAPIError(
+                status_code=response.status_code,
+                message="Response was not valid JSON.",
+                url=response.url,
+            ) from exc
+
+    def get_weekly_projections(
+        self,
+        season: int | str,
+        week: int,
+        season_type: str = "regular",
+    ) -> List[Dict[str, Any]]:
+        """
+        Get projections for every player for a given season/week.
+
+        Endpoint:
+            GET https://api.sleeper.com/projections/nfl/{season}/{week}?season_type=regular
+        """
+
+        return self._get(
+            f"{self.BASE_URL}/{season}/{week}",
+            params={"season_type": season_type},
+        )
+
+    def get_player_projection(
+        self,
+        player_id: str,
+        season: int | str,
+        season_type: str = "regular",
+        grouping: str = "season",
+    ) -> Any:
+        """
+        Get projection(s) for a single player.
+
+        Endpoint:
+            GET https://api.sleeper.com/projections/nfl/player/{player_id}?season=...&season_type=...&grouping=...
+
+        ``grouping``:
+            "season" -- a single season-level aggregate projection.
+            "week"   -- a list of weekly projections for the season.
+        """
+
+        if grouping not in {"season", "week"}:
+            raise ValueError("grouping must be either 'season' or 'week'.")
+
+        return self._get(
+            f"{self.BASE_URL}/player/{player_id}",
+            params={
+                "season": season,
+                "season_type": season_type,
+                "grouping": grouping,
+            },
+        )
+
+
 # ================================================================
 # Example usage
 # ================================================================
